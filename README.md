@@ -29,6 +29,7 @@ curl -X POST http://localhost:3000/api/features/1 -H "Content-Type: application/
 feature12/
 ├── .github/
 │   └── workflows/
+│       ├── cd.yml
 │       └── ci.yml
 ├── docs/
 │   ├── evidencias-docker.md
@@ -127,6 +128,8 @@ docker load -i lab40-feature12.tar
 O arquivo `.tar` não é versionado (está no `.gitignore`). Evidência do teste local: [docs/evidencias-docker.md](docs/evidencias-docker.md).
 
 ## Importante
-O repositório-base foi entregue sem testes, análise estática e CI; esses itens foram adicionados nesta entrega. O CD simulado depende do YAML fornecido pelo professor.
+O repositório-base foi entregue sem testes, análise estática, CI e CD; esses itens foram adicionados nesta entrega.
+
+O [CD simulado](.github/workflows/cd.yml) roda em `push` na `main`. Ele testa, constrói e valida a imagem e publica o artefato `lab40-delivery-record`, com o `.tar` e o `deployment-record.txt` (repositório, referência, SHA e tag). Não publica em registry nem implanta em servidor. O YAML foi criado nesta entrega a partir do GUIA, pois não foi encontrado um arquivo fornecido pelo professor.
 
 O servidor escuta `process.env.PORT` e `0.0.0.0`, e a aplicação não persiste dados em disco.

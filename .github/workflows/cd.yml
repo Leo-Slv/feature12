@@ -1,0 +1,75 @@
+name: CD simulado
+
+# Entrega simulada: nao publica em registry nem implanta em servidor.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  entrega:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: lab40:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Verificar codigo antes da entrega
+        run: |
+          npm ci
+          npm test
+
+      - name: Construir imagem identificada por tag e SHA
+        run: |
+          docker build --pull -t lab40:feature12 -t "$IMAGE_TAG" .
+          docker images lab40
+
+      - name: Validar a imagem que sera entregue
+        run: |
+          docker run -d --name lab40-container -p 3000:3000 "$IMAGE_TAG"
+          docker ps
+          curl --fail --retry 10 --retry-delay 2 --retry-all-errors http://localhost:3000/health
+          echo
+          curl --fail -X POST http://localhost:3000/api/features/12 \
+            -H "Content-Type: application/json" \
+            -d '{"texto":"GitHub Actions"}' | tee resposta.json
+          echo
+          grep -q 'GITHUB ACTIONS' resposta.json
+
+      - name: Logs e limpeza do container
+        if: always()
+        run: |
+          docker logs lab40-container || true
+          docker rm -f lab40-container || true
+
+      - name: Exportar imagem e gerar registro da entrega
+        run: |
+          mkdir entrega
+          docker save lab40:feature12 "$IMAGE_TAG" -o entrega/lab40-feature12.tar
+          {
+            echo "LAB40 - Registro de entrega simulada"
+            echo "Repositorio: ${GITHUB_REPOSITORY}"
+            echo "Referencia: ${GITHUB_REF}"
+            echo "SHA: ${GITHUB_SHA}"
+            echo "Tag da imagem: ${IMAGE_TAG}"
+            echo "ID da imagem: $(docker image inspect "$IMAGE_TAG" --format '{{.Id}}')"
+            echo "Execucao: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "Data (UTC): $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "Implantacao: simulada (sem registry e sem servidor)"
+          } > entrega/deployment-record.txt
+          cat entrega/deployment-record.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab40-delivery-record
+          path: entrega/
+          if-no-files-found: error
