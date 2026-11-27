@@ -39,4 +39,4 @@ Invoke-RestMethod -Method Post -Uri http://localhost:3000/api/features/12 -Conte
 | Passos | Como foi executado | Resultado |
 |--------|--------------------|-----------|
 | 1 a 7 | Script Node contra o servidor real, em 27/11/2026, Node 24.14.0, porta 3101 | Todos com o status e o resultado esperados |
-| 8 | Pendente | Executar no navegador e anexar a captura de tela |
+| 8 | Executado pelo estudante na interface web, em 27/11/2026 | Aprovado: HTTP 200, `GITHUB ACTIONS` e cartão 12 como **Implementada** (captura de tela do estudante, não versionada) |
