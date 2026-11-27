@@ -1,15 +1,18 @@
 // Funcionalidade 12: Conversor para maiúsculas.
 // Objetivo: Converte texto para letras maiúsculas.
 // Exemplo de entrada: { texto: 'GitHub Actions' }
-// Implemente conforme as regras e critérios do enunciado fornecido pelo professor.
+// Regras: `texto` deve ser string; espaços, números e pontuação são preservados.
 
-const implemented = false;
+const implemented = true;
 
-// Desenvolva a regra de negócio e valide todos os dados de entrada.
+// Valida a entrada e converte o texto sem modificar o objeto recebido.
 function execute(input) {
-  // TODO: substituir este bloco pela implementação testada da funcionalidade.
-  void input;
-  throw new Error("Funcionalidade ainda não implementada.");
+  const { texto } = input || {};
+  if (typeof texto !== "string") {
+    throw new Error("Texto deve ser string.");
+  }
+  // Usa o locale pt-BR para o resultado não depender do idioma da máquina.
+  return { resultado: texto.toLocaleUpperCase("pt-BR") };
 }
 
 // Mantém o contrato de integração utilizado pela API central.
