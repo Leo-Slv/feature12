@@ -72,6 +72,7 @@ npm ci
 npm run format:check   # formatação (npm run format corrige)
 npm run lint           # análise estática
 npm test               # testes automatizados (node:test)
+npm run test:spec      # mesmos testes, com relatório detalhado
 npm run test:smoke     # sobe o servidor na porta 3100 e valida a API
 npm audit --audit-level=high
 ```

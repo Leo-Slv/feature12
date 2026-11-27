@@ -1,8 +1,24 @@
+// Testes de referência – Feature 12
+// Execute com: node --test test/feature12.test.js
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const feature = require("../src/features/feature12");
 
-test("caso tipico: converte para maiusculas", () => {
+test("converte letras para maiúsculas", () => {
+  assert.equal(feature.execute({ texto: "GitHub Actions" }).resultado, "GITHUB ACTIONS");
+});
+
+test("preserva espaços, pontuação, números e trata acentos", () => {
+  assert.equal(feature.execute({ texto: "ação 123!" }).resultado, "AÇÃO 123!");
+  assert.equal(feature.execute({ texto: "" }).resultado, "");
+});
+
+test("rejeita entrada não textual", () => {
+  assert.throws(() => feature.execute({ texto: false }), { name: "Error" });
+});
+
+// Testes complementares: casos do Caderno de Enunciados.
+test("caso tipico: retorna o objeto no formato do contrato", () => {
   assert.deepEqual(feature.execute({ texto: "GitHub Actions" }), {
     resultado: "GITHUB ACTIONS"
   });
@@ -10,14 +26,6 @@ test("caso tipico: converte para maiusculas", () => {
 
 test("converte texto todo em minusculas", () => {
   assert.equal(feature.execute({ texto: "fatec" }).resultado, "FATEC");
-});
-
-test("trata acentos", () => {
-  assert.equal(feature.execute({ texto: "ação é útil" }).resultado, "AÇÃO É ÚTIL");
-});
-
-test("limite: texto vazio continua vazio", () => {
-  assert.equal(feature.execute({ texto: "" }).resultado, "");
 });
 
 test("preserva espacos, numeros e simbolos", () => {

@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "test": "node --test",
+    "test:spec": "node --test --test-reporter=spec",
     "test:smoke": "node scripts/smoke.js",
     "lint": "eslint .",
     "format": "prettier --write src/features/feature12.js test scripts eslint.config.js",
