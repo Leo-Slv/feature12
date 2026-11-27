@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm test
+      - run: npm run test:smoke
+      - run: npm audit --audit-level=high
+
+      - name: Construir imagem com tag e SHA
+        run: |
+          docker build --pull -t lab40:feature12 -t "lab40:${GITHUB_SHA}" .
+          docker images lab40
+
+      - name: Validar container
+        run: |
+          docker run -d --name lab40-container -p 3000:3000 "lab40:${GITHUB_SHA}"
+          docker ps
+          curl --fail --retry 10 --retry-delay 2 --retry-all-errors http://localhost:3000/health
+          curl --fail -X POST http://localhost:3000/api/features/12 \
+            -H "Content-Type: application/json" \
+            -d '{"texto":"GitHub Actions"}' | tee resposta.json
+          grep -q 'GITHUB ACTIONS' resposta.json
+
+      - name: Logs e limpeza do container
+        if: always()
+        run: |
+          docker logs lab40-container || true
+          docker rm -f lab40-container || true
+
+      - name: Exportar imagem
+        run: docker save lab40:feature12 "lab40:${GITHUB_SHA}" -o lab40-feature12.tar
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lab40-feature12-image-${{ github.sha }}
+          path: lab40-feature12.tar
+          if-no-files-found: error
